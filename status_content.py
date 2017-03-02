@@ -26,6 +26,8 @@ import pandas as pd
 import numpy as np
 
 filepath = "/home/kln/projects/bechmann/data/sample"
+#filepath = "C:\Users\Administrator\Desktop\staythefoxout\data\sample" # for win server
+#filepath = "/home/kln/projects/bechmann/data/dummy_sample"# redundant dummmy
 # import files as list of tables
 def import_status(filepath):
     files = os.listdir(filepath)
@@ -53,18 +55,18 @@ def import_status(filepath):
     status_df = pd.concat(status_df) 
     return(status_df)
 status_df = import_status(filepath)
+# remove NaN
 status_df = status_df[pd.isnull(status_df['content']) != 1]
-
 # preprocess
 content = list(status_df.loc[:,'content'])
+## build feature of tokenize content in df
 # normalize danish unicode characters, remove non-alphabetic chars, casefold and tokenize
-import re 
 from unidecode import unidecode
 def normtoken(s):
     if pd.isnull(s):# check for nan
         return s
     else:
-        regex = re.compile('[",-\.!?0-9]')
+        regex = re.compile('[\#\",-\.!?0-9]')# TODO: expand
         s = unidecode(s.lower())
         s = regex.sub('', s)
     return s.split()
@@ -85,84 +87,94 @@ status_df['tokens'] = contoken
 # status_df = status_df[pd.isnull(status_df['tokens']) != 1]
 status_df = status_df.reset_index()
 
-
+status_df.head()
+print content[2]
+print status_df.loc[2,'tokens']
 
 ##########################
 # calculate average distance 
-import distance
+
+
+# loop through source on targets
+import distance, time
+t1 = time.time()
+
 id_u = sorted(list(set(status_df.loc[:,'id'])))
-id_bool = status_df.loc[:,'id'] == id_u[0]
-# loop through sources s
-s = status_df.loc[:,'tokens'][id_bool].reset_index()
-# loop through targets t
-dst = [] # distance vector for each target
-for ii in range(0+1,len(id_u)):
-    print 'target: ' + str(ii)
-    t = status_df.loc[:,'tokens'][status_df.loc[:,'id'] == id_u[ii]].reset_index()
-    d = []
-    for i in range(0,len(t)):
-        # print 'update: ' + str(i)
-        t1 = " ".join(s.iloc[0,1])
-        t2 = " ".join(t.iloc[i,1])
-        d.append(distance.nlevenshtein(t1, t2, method=1))
-    dst.append(d)
-    print np.mean(d), np.std(d)
-##########################
+idx = 0# index unique id list
+id_bool = status_df.loc[:,'id'] == id_u[idx]
+
+source = status_df.loc[:,'tokens'][id_bool].reset_index()
+source_ls = []
 j = 0
-np.mean(dst[j])
-np.std(dst[j])
+for s in source.loc[:,'tokens']:
+#for k in range(1,4):   ### debugging
+    j += 1    
+    s = " ".join(s) 
+#    s = " ".join(source.loc[k,'tokens']) ### debugging        
+    result_mat = np.zeros((len(id_u)-(idx+1),5))
+    jj = 0    
+    for i in range(idx+1,len(id_u)):
+        #i = 2
+        target = status_df.loc[:,'tokens'][status_df.loc[:,'id'] == id_u[i]].reset_index()
+        d = []
+        y = 0         
+        for t in target.loc[:,'tokens']:
+            t = " ".join(t)
+            d.append(distance.nlevenshtein(s, t, method=1))
+            y += 1; print y
+        # result = [np.min(d), np.std(d)]
+        # print result
+        result_mat[jj,0] = j # index for s (source post)
+        result_mat[jj,1] = id_u[idx] # source name
+        result_mat[jj,2] = id_u[i] # target name
+        result_mat[jj,3] = np.min(d) # minimum distance between posts
+        result_mat[jj,4] = np.std(d) # sd in distances
+        jj += 1
+    source_ls.append(result_mat)    
+    source_mat = np.vstack(source_ls) # unstack list of arrays
+print time.time() - t1
 
-
-t0 = status_df['tokens'][0]
-t1 = status_df['tokens'][1]
-t2 = status_df['tokens'][2] 
-t0 = " ".join(t0)
-t1 = " ".join(t1)
-t2 = " ".join(t2)
-distance.nlevenshtein(t1, t0, method=1)# shortest alignment
-distance.nlevenshtein(t1, t2, method=1)
-distance.nlevenshtein(t0, t2, method=1)
-distance.nlevenshtein(t1, t0, method=2)# shortest alignment
-distance.nlevenshtein(t1, t2, method=2)
-distance.nlevenshtein(t0, t2, method=2)
-distance.levenshtein(t1, t0)
-distance.levenshtein(t1, t2)
-
+### loop over source in sources on target in targets
+import distance, time
+t1 = time.time()
 
 id_u = sorted(list(set(status_df.loc[:,'id'])))
-id_loop = status_df.loc[:,'id'] == id_u[0]
-status_df['tokens']
-##########################
-
-
-
-id_u = list(set(status_df.loc[:,'id']))
-id_bool = status_df.loc[:,'id'] == id_u[2]
-s = status_df.loc[:,'content']
-
-
-
-
-
-# average distance between 
-import editdistance
-# compare strings
-editdistance.eval('banana', 'bahama')
-# compare list of strings, normal Levenshtein is length dependent
-editdistance.eval(['spam', 'egg'], ['spam', 'ham'])
-editdistance.eval(['spam', 'egg'], ['ham', 'spam'])
-
-
-import distance
-t1 = ("de", "ci", "si", "ve")
-t2 = ("de", "ri", "si", "ve")
-distance.levenshtein(t1, t2)
-# normalized Levenshtein
-distance.nlevenshtein("abc", "acd", method=1)  # shortest alignment between the sequences is taken as factor
-distance.nlevenshtein("abc", "acd", method=2)  # length of longest alignment
-distance.levenshtein(t1, t2)
-distance.nlevenshtein(t1, t2, method=1)# shortest alignment
-distance.nlevenshtein(t1, t2, method=2)
-# nomalied hamming
-distance.hamming("fat", "cat")
-distance.hamming("fat", "cat", normalized=True)
+idx = 0# index unique id list
+id_bool = status_df.loc[:,'id'] == id_u[idx]
+sources_ls = []
+for idx in range(0, len(id_u)):
+    print id_u[idx]
+    if idx == len(id_u)-1: break # break when no target left in targets
+    id_bool = status_df.loc[:,'id'] == id_u[idx]
+    source = status_df.loc[:,'tokens'][id_bool].reset_index()
+    source_ls = []
+    j = 0
+    for s in source.loc[:,'tokens']:
+    #for k in range(1,4):   ### debugging
+        j += 1        
+        s = " ".join(s) 
+        #s = " ".join(source.loc[k,'tokens']) ### debugging        
+        result_mat = np.zeros((len(id_u)-(idx+1),5))
+        jj = 0
+        for i in range(idx+1,len(id_u)):
+            #i = 2
+            target = status_df.loc[:,'tokens'][status_df.loc[:,'id'] == id_u[i]].reset_index()
+            d = []
+            y = 0
+            for t in target.loc[:,'tokens']:
+                t = " ".join(t)
+                d.append(distance.nlevenshtein(s, t, method=1))
+                y += 1#; print y
+            result_mat[jj,0] = j
+            result_mat[jj,1] = id_u[idx]
+            result_mat[jj,2] = id_u[i]
+            result_mat[jj,3] = np.min(d)
+            result_mat[jj,4] = np.std(d)
+            jj += 1
+        source_ls.append(result_mat)    
+        source_mat = np.vstack(source_ls) # unstack list of arrays
+    sources_ls.append(source_mat)
+    
+sources_mat = np.vstack(sources_ls)    
+timeused = time.time() - t1
+print timeused

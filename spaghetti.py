@@ -61,6 +61,66 @@ print id_list
 for fbid in id_list:
     print fbid
 
+##############################
+##########################
+j = 0
+np.mean(dst[j])
+np.std(dst[j])
+
+
+t0 = status_df['tokens'][0]
+t1 = status_df['tokens'][1]
+t2 = status_df['tokens'][2] 
+t0 = " ".join(t0)
+t1 = " ".join(t1)
+t2 = " ".join(t2)
+distance.nlevenshtein(t1, t0, method=1)# shortest alignment
+distance.nlevenshtein(t1, t2, method=1)
+distance.nlevenshtein(t0, t2, method=1)
+distance.nlevenshtein(t1, t0, method=2)# shortest alignment
+distance.nlevenshtein(t1, t2, method=2)
+distance.nlevenshtein(t0, t2, method=2)
+distance.levenshtein(t1, t0)
+distance.levenshtein(t1, t2)
+
+
+id_u = sorted(list(set(status_df.loc[:,'id'])))
+id_loop = status_df.loc[:,'id'] == id_u[0]
+status_df['tokens']
+##########################
+
+
+
+id_u = list(set(status_df.loc[:,'id']))
+id_bool = status_df.loc[:,'id'] == id_u[2]
+s = status_df.loc[:,'content']
+
+
+
+
+
+# average distance between 
+import editdistance
+# compare strings
+editdistance.eval('banana', 'bahama')
+# compare list of strings, normal Levenshtein is length dependent
+editdistance.eval(['spam', 'egg'], ['spam', 'ham'])
+editdistance.eval(['spam', 'egg'], ['ham', 'spam'])
+
+
+import distance
+t1 = ("de", "ci", "si", "ve")
+t2 = ("de", "ri", "si", "ve")
+distance.levenshtein(t1, t2)
+# normalized Levenshtein
+distance.nlevenshtein("abc", "acd", method=1)  # shortest alignment between the sequences is taken as factor
+distance.nlevenshtein("abc", "acd", method=2)  # length of longest alignment
+distance.levenshtein(t1, t2)
+distance.nlevenshtein(t1, t2, method=1)# shortest alignment
+distance.nlevenshtein(t1, t2, method=2)
+# nomalied hamming
+distance.hamming("fat", "cat")
+distance.hamming("fat", "cat", normalized=True)
 
 
 
@@ -74,3 +134,7 @@ text = 'gfgfdAAA1234ZZZuijjk'
 m = re.search('AAA(.+?)ZZZ', text)
 if m:
     found = m.group(1)
+    
+    
+    
+    
