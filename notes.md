@@ -26,7 +26,8 @@ hashlib - hash value
    - get
 
 ## design ##
-1. normalized edit distance between all posts for one --> edit distance matrix  
+1. normalized edit distance between all posts for one --> edit distance matrix (text reuse)
 2. cluster topics
 3. topic model for each post and KL divergence
-4. edit distance on fbid and kld on status?
+4. edit distance on fbid and kld on status (text reuse)
+5. sequence alignment (text reuse)

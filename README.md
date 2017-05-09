@@ -10,7 +10,8 @@
 5. Submit a pull request
 
 ## History ##
-
+Data import  
+May17: Data extraction  
 ## Credits ##
 
 ## License ##
