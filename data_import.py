@@ -18,7 +18,7 @@ def folder_import(folderpath):
     os.chdir(folderpath)
     for file in files:
         print file
-        df_list.append(pd.read_table(file, header = None, encoding = 'utf-8'))
+        df_list.append(pd.read_table(file, header = None, encoding = 'utf-8', quoting=3))
     #for i in range(len(files)):# get id
     #    files[i] = re.sub(r'\.txt$', '', files[i])
     # files = map(int, files) # convert to integer
@@ -31,7 +31,7 @@ def get_photo(df_list, files):
     photo_df = []
     for i in range(len(df_list)):
         print files[i]
-        df = df = df_list[i]
+        df = df_list[i]
         photo = df[df.iloc[:,2].str.contains('photo')].iloc[:,[1,3,7]]
         photo.columns = ['time', 'comment','image_id']
         filenumber = int(re.findall(r'\d+', files[i])[0])

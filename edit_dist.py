@@ -7,7 +7,12 @@ __author__  = 'KLN'
 
 import os, distance, platform
 import numpy as np
-os.chdir(os.path.expanduser("~/Documents/proj/bechmann/filterbubble_fb"))
+
+os_name = platform.system()
+if os_name == 'Windows':
+    os.chdir('D:\\KLN\\drive\\proj\\bechmann\\filterbubble_fb')
+else:
+    os.chdir(os.path.expanduser("~/Documents/proj/bechmann/filterbubble_fb"))
 import data_import as di
 from data_norm import normstatus
 

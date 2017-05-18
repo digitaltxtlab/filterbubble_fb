@@ -9,16 +9,18 @@ import os, re
 from unidecode import unidecode
 from nltk.stem.snowball import SnowballStemmer
 
-def normstatus(df):
+def normstatus(df, stem = 1):
     """ Danish language normalization for status updates from data_import.get_status"""
-    stemmer = SnowballStemmer('danish', ignore_stopwords = True)
+    if stem == 1:
+        stemmer = SnowballStemmer('danish', ignore_stopwords = True)
     pat = re.compile('\W+')
     for i in range(len(df)):
         s = df.loc[i,'content']
         s = s.lower()
-        tokens = s.split()
-        tokens = [stemmer.stem(token) for token in tokens]
-        s = ' '.join(tokens)
+        if stem == 1:
+            tokens = s.split()
+            tokens = [stemmer.stem(token) for token in tokens]
+            s = ' '.join(tokens)
         s = unidecode(s)
         s = pat.sub(' ',s)
         df.loc[i,'content'] = s
