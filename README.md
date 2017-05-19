@@ -11,7 +11,9 @@
 
 ## History ##
 Data import  
-May17: Data extraction  
+May17: Data extraction
+May18: cleaning for geometrical distance & script for win server
+May19: clustering pipeline  
 ## Credits ##
 
 ## License ##
