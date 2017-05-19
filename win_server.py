@@ -14,7 +14,7 @@ from edit_dist import norm_edist
 
 import time
 
-sourcepath = 'D:\\KLN\\drive\\proj\\bechmann\\data\\sample100\\'
+sourcepath = 'D:\\KLN\\drive\\proj\\bechmann\\data\\sample\\'
 targetpath = ''
 
 t1 = time.time()
@@ -26,7 +26,8 @@ print t2-t1
 
 
 res =  norm_edist(df_status_norm)
+
 np.savetxt(targetpath, res, delimiter = ',')
 print 'edit distance matrix saved'
 
-import nltk
+df_status_norm.head()
