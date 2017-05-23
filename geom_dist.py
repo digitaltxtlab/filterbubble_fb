@@ -79,9 +79,11 @@ def prunemin(l,minfr = 1):
     return res
 
 
-
 ## main()
+# sample
 sourcepath = os.path.expanduser('~/Documents/proj/bechmann/data/export_news_feed/')
+# all data
+sourcepath = os.path.expanduser('~/Documents/proj/bechmann/data/org/export_news_feed/')
 df_list, ids = di.folder_import(sourcepath)
 df_status = di.get_status(df_list, ids)
 # filter on language
@@ -89,8 +91,9 @@ if 'data_lang' not in locals():
     data_lang, idx_da = langlist(list(df_status.loc[:,'content']))
 else:
     print 'language vector exists'
+    
 df_status = df_status.iloc[idx_da,:].reset_index()
-del df_status['index']# delete index column
+del df_status['index']
 # normalize
 data = list(df_status.loc[:,'content'])
 data2 = cleanlist(data)
@@ -103,7 +106,7 @@ for i in range(df_status.shape[0]):
     if len(df_status.loc[i,'content_clean']) == 0:
         idx.append(i)
 df_status = df_status.drop(df_status.index[idx]).reset_index()
-del df_status['index']# delete index column
+del df_status['index']
 df_status.head()
 
 
@@ -243,8 +246,5 @@ for topic in topicmat:
 dir(lda)
 
 docrep = lda.get_document_topics(bow, minimum_probability=0)
-
-test[0]
-
 
 

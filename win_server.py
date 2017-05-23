@@ -4,9 +4,16 @@
 run edit_dist on win server
 """
 
-import os
+import os, platform
 import numpy as np
-os.chdir('D:\\KLN\\drive\\proj\\bechmann\\filterbubble_fb\\')
+
+os_name = platform.system()
+if os_name == 'Windows':
+    os.chdir('D:\\KLN\\drive\\proj\\bechmann\\filterbubble_fb')
+    sourcepath = 'D:\\KLN\\drive\\proj\\bechmann\\data\\sample\\'
+else:
+    os.chdir(os.path.expanduser("~/Documents/proj/bechmann/filterbubble_fb"))
+    sourcepath = os.path.expanduser('~/Documents/proj/bechmann/data/sample/')
 import data_import as di
 from data_norm import normstatus
 from edit_dist import norm_edist
@@ -14,7 +21,7 @@ from edit_dist import norm_edist
 
 import time
 
-sourcepath = 'D:\\KLN\\drive\\proj\\bechmann\\data\\sample\\'
+
 targetpath = ''
 
 t1 = time.time()
@@ -28,6 +35,9 @@ print t2-t1
 res =  norm_edist(df_status_norm)
 
 np.savetxt(targetpath, res, delimiter = ',')
-print 'edit distance matrix saved'
+print 'distance matrix saved'
 
-df_status_norm.head()
+
+### link comparison
+df_list, files = di.folder_import(sourcepath)
+link_df = di.get_link(df_list,files)

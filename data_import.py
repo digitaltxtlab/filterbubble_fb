@@ -6,13 +6,8 @@ import os, re
 import pandas as pd
 import numpy as np
 
-# filepath = os.path.expanduser('~/Documents/proj/bechmann/data/sample/')
-# status_df = import_status(filepath)
-# status_df.loc[0,'content']
-
-# read full data frame for each participant
 def folder_import(folderpath):
-    """ import list of full dataframes for each user on path"""
+    """ import list of dataframes for each user on path"""
     files = os.listdir(folderpath)
     df_list = []
     os.chdir(folderpath)
@@ -23,8 +18,6 @@ def folder_import(folderpath):
     #    files[i] = re.sub(r'\.txt$', '', files[i])
     # files = map(int, files) # convert to integer
     return df_list, files
-
-# df_list, ids = folder_import(filepath)
 
 def get_photo(df_list, files):
     """ get photo posts from list of dataframes (folder_import) to dataframe with filename as id """
@@ -41,10 +34,6 @@ def get_photo(df_list, files):
         photo_df.append(photo[cols])
     photo_df = pd.concat(photo_df)
     return photo_df.reset_index().drop('index',axis=1)
-
-#df_photo = get_photo(df_list,ids)
-#df_photo.head()
-#print df_p
 
 def get_status(df_list, files):
     """ get status posts from list of dataframes (folder_import) to dataframe with filename as id """
@@ -65,4 +54,26 @@ def get_status(df_list, files):
     status_df = status_df.loc[idx,:].reset_index()
     return status_df.drop('index',axis=1) # remove old index
 
-# df_status = get_status(df_list, ids)
+def get_link(df_list, files):
+    """ get links from each post and remove redundant characters"""
+    pats = [re.compile(s) for s in ['http://','https://','www.']]
+    link_df = []
+    for i in range(len(df_list)):
+        df = df_list[i]
+        link  = df[df.iloc[:,2].str.contains('link')].iloc[:,[1,3,7]]
+        link.columns = ['time','origin','content']
+        idx = pd.isnull(link.origin) != True
+        link = link.loc[idx,['time','content']]
+        for ii in range(len(link.content)):
+            s = link.content.iloc[ii]
+            for pat in pats:
+                s = pat.sub('',s)
+                link.content.iloc[ii] = s
+        filenumber = int(re.findall(r'\d+', files[i])[0])
+        link['id'] = pd.Series((np.repeat(filenumber,np.shape(link)[0])), index = link.index)
+        cols = link.columns.tolist()
+        cols = cols[-1:] + cols[:-1]
+        link_df.append(link[cols])
+    link_df = pd.concat(link_df)
+    link_df = link_df.reset_index()
+    return link_df.drop('index',axis = 1)

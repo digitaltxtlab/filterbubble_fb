@@ -29,7 +29,7 @@ def main():
     df_status_norm = normstatus(df_status)
     res =  norm_edist(df_status_norm)
     np.savetxt(targetpath, res, delimiter = ',')
-    print 'edit distance matrix saved'
+    print 'distance matrix saved'
 
 def norm_edist(df):
     id_u = sorted(list(set(df.loc[:,'id'])))
